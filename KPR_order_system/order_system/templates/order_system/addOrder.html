@@ -1,0 +1,10 @@
+{% extends 'order_system/base.html' %} 
+{% block content %}
+<div class="text-center my-5">
+<h1 class="my-5">Přidat objednávku</h1>
+<form action="{% url 'addOrder' %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Vytvořit novou objednávku</button>
+</form>
+</div>
+{% endblock %}

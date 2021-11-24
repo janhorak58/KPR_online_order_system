@@ -1,0 +1,22 @@
+h1 {
+    font-size: 3rem;
+    text-align: center;
+    color: #154D80;
+}
+
+main {
+    background-color: #FCC100;
+    margin: 2rem 0;
+    padding: 2rem 1rem;
+    border-radius: 10px;
+}
+.login-button-container {
+    margin-top: 20vh;
+    text-align: center;
+}
+
+.btn-login {
+    padding: 2rem 8rem;
+    font-size: 3rem;
+
+}

@@ -1,0 +1,49 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarTogglerDemo01"
+      aria-controls="navbarTogglerDemo01"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+      <a class="navbar-brand mx-5" href="{% url 'prehled' %}"
+        ><img
+          id="img-navbar-brand"
+          src="{% static 'images/knizky_pro_rozvoj_logo.png' %}"
+          alt="Knížky pro rozvoj - Logo"
+      /></a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item mx-5">
+          <a
+            class="nav-link active"
+            aria-current="page"
+            href="{% url 'prehled' %}"
+            >Přehled</a
+          >
+        </li>
+        <li class="nav-item mx-5">
+          <a class="nav-link" href="{% url 'addOrder' %}">Přidat</a>
+        </li>
+      </ul>
+      {% if user.is_authenticated %}
+
+      <form
+        action="{% url 'logoutuser' %}"
+        method="post"
+        class="nav-link d-flex me-2"
+      >
+        {% csrf_token %}<button type="submit" class="btn btn-primary">
+          Odhlásit se
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</nav>

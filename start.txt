@@ -1,0 +1,12 @@
+#1 Activate Virtual Environment
+order_system_venv\Scripts\activate
+
+#2 Go to project folder
+cd KPR_order_system
+
+#3 Run Server
+python manage.py runserver
+
+order_system_venv\Scripts\activate
+cd KPR_order_system
+python manage.py runserver

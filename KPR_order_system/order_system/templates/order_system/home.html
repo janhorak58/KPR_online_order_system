@@ -1,0 +1,40 @@
+{% extends 'order_system/base.html' %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
+
+{% endblock %} {% block content %} {% if not user.is_authenticated %}
+
+<h1>Vítej v Objdenávkovém systému Knížky pro rozvoj s.r.o.</h1>
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <h2>Přihlášení do systému</h2>
+  </div>
+</div>
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    {% if error %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="{% url 'loginuser' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" class="form-control" id="username" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          id="password"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary my-3">Přihlásit se</button>
+    </form>
+    <hr />
+  </div>
+</div>
+{% else %}
+<h1>Vitej - Pokračuj dále kliknutím <a href="{% url 'prehled' %}">SEM</a></h1>
+{% endif %} {% endblock %}

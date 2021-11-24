@@ -1,0 +1,193 @@
+{% extends 'order_system/base.html' %} {% load static %} 
+{% block content %}
+<h1 class="my-5">Detail Objednávky č. {{order.id}}</h1>
+<a href="{% url 'editOrder' order.id %}" class="btn btn-secondary my-5"
+  >Upravit Objednávku</a
+>
+
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Parametr</th>
+      <th scope="col">Hodnota</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>číslo objednávky ve WP</td>
+      <td>{{order.number}}</td>
+    </tr>
+    <tr>
+      <td>Vytvořena dne</td>
+      <td>{{order.created_date}}</td>
+    </tr>
+    <tr>
+      <td>Zaplaceno</td>
+      {% if order.paid %}
+      <td class="text-success">ANO</td>
+      {% else %}
+      <td class="text-danger">NE</td>
+      {% endif %}
+    </tr>
+    <tr>
+      <td>Platební metoda</td>
+
+      {% if order.payment_method == "Comgate_karta" %}
+      <td>Comgate - Platba Kartou</td>
+
+      {% elif order.payment_method == "Comgate_prevod" %}
+      <td>Comgate - Platba Převodem na Účet</td>
+      {% else %}
+      <td>Platba Hotově</td>
+      {% endif %}
+    </tr>
+
+    <tr>
+      <td>Stav Objednávky</td>
+
+      {% if order.state == "zpracovava_se" %}
+      <td class="text-warning">Objednávka se zpracovává</td>
+
+      {% elif order.state == "odeslana" %}
+      <td class="text-primary">Objednávka byla odeslána</td>
+      {% elif order.state == "dokoncena" %}
+      <td class="text-success">Objednávka je dokončena</td>
+      {% else %}
+      <td class="text-danger">Objednávka byla zrušena</td>
+      {% endif %}
+    </tr>
+
+    <tr>
+      <td>Objednáno přes</td>
+
+      {% if order.through_option == "pemic" %}
+      <td>Pemic</td>
+
+      {% else %}
+      <td>E-shop - ZonerPress</td>
+      {% endif %}
+    </tr>
+
+    <tr>
+      <td>Sleva</td>
+      <td>{{order.sale}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="my-5"><strong>Poznámka: </strong>{{order.note}}</p>
+
+<h2 class="my-5">Parametry doručení</h2>
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Parametr</th>
+      <th scope="col">Hodnota</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Kam budeme doručovat</td>
+      {% if order.shipping.type == "Zasilkovna_na_adresu" %}
+      <td>Zásilkovna - na adresu = 89,-</td>
+
+      {% elif order.shipping.type == "Zasilkovna_na_vydejni_misto" %}
+      <td>Zásilkovna - na výdejní místo = 69,-</td>
+      {% else %}
+      <td>Okolí MH = 30,-</td>
+      {% endif %}
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="my-5">Fakturační adresa</h3>
+<table class="table table-hover table-striped ">
+  <thead>
+    <tr>
+      <th scope="col">Parametr</th>
+      <th scope="col">Hodnota</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jméno</td>
+      <td>{{addresses.0.jmeno}}</td>
+    </tr>
+    <tr>
+      <td>Město</td>
+      <td>{{addresses.0.mesto}}</td>
+    </tr>
+    <tr>
+      <td>Ulice</td>
+      <td>{{addresses.0.ulice}}</td>
+    </tr>
+    <tr>
+      <td>PSČ</td>
+      <td>{{addresses.0.psc}}</td>
+    </tr>
+  </tbody>
+</table>
+{% if not order.shipping.FisD %}
+<h3 class="my-5">Dodací adresa</h3>
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Parametr</th>
+      <th scope="col">Hodnota</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jméno</td>
+      <td>{{addresses.1.jmeno}}</td>
+    </tr>
+    <tr>
+      <td>Město</td>
+      <td>{{addresses.1.mesto}}</td>
+    </tr>
+    <tr>
+      <td>Ulice</td>
+      <td>{{addresses.1.ulice}}</td>
+    </tr>
+    <tr>
+      <td>PSČ</td>
+      <td>{{addresses.1.psc}}</td>
+    </tr>
+  </tbody>
+</table>
+{% else %}
+<p>Dodací adresa je shodná s Fakturační adresou</p>
+{% endif%}
+{% if order.faktura %}
+<div class="my-5">
+  <h2>Faktura</h2>
+  <a href="{{order.faktura.url}}">Faktura</a>
+
+</div>
+{% endif %}
+{% if order.dodaci_list %}
+<div class="my-5">
+  <h2>Dodací list</h2>
+  <a href="{{order.dodaci_list.url}}">Dodací list</a>
+
+</div>
+{% endif %}
+
+{% if books|length > 0 %}
+<h2 class="my-5">Knihy</h2>
+<ul class="list-group list-group-flush my-5">
+  {% for book in books %}
+  <li class="list-group-item my-3">
+    <a href="{% url 'editBook' order.id book.id %}"><span class="mx-5">{{book.name}}</a></span> | <span class="mx-5">{{book.author}}</span> | <span class="mx-5">{{book.price}} Kč</span> | <span class="mx-5">{{book.qty}} x</span>
+  </li>
+  {% endfor %}
+</ul>
+
+<div class="my-5">
+
+ 
+
+<h2>Cena celkem:</h2><strong>{{total}} Kč</strong>
+</div>
+
+{% endif %}  {% endblock %}

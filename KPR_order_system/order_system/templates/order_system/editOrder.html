@@ -1,0 +1,278 @@
+{% extends 'order_system/base.html' %} {% block content %} {% if order %}
+<div class="my-5">
+  <h1 class="my-5">Upravit objednávku č. {{ order.id }}</h1>
+  <a href="{% url 'detailOrder' order.id %}" class="btn btn-secondary my-5"
+  >Podrobnosti</a
+>
+  <form action="{% url 'editOrder' order.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label" for="id">Číslo objednávky v systému KPR</label>
+        <input class="form-control"
+          type="number"
+          name="id"
+          id="id"
+          value="{{order.id}}"
+          disabled
+        />
+      </div>
+    <div class="mb-3">
+      <label class="form-label" for="number">Číslo objednávky ve WP</label>
+      <input class="form-control"
+        type="number"
+        name="number"
+        id="number"
+        value="{{order.number}}"
+      />
+    </div>
+
+    <div class="mb-3">
+        {% if order.paid %}
+        <input class="form-check-input" type="checkbox" name="paid" id="paid" checked value="paid"/>
+        {% else %}
+        <input class="form-check-input" type="checkbox" name="paid" id="paid" value="not_paid"/>
+
+        {% endif %}
+        <label class="form-check-label" for="paid">Zaplaceno</label>
+      </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="payment_method">Platební metoda</label>
+      <select
+        name="payment_method"
+        value="{{order.payment_method}}"
+        id="payment_method"
+      >
+        <option value="Comgate_karta" {% if order.payment_method == 'Comgate_karta' %}selected{% endif %}>Comgate - Karta</option>
+        <option value="Comgate_prevod" {% if order.payment_method == 'Comgate_prevod' %}selected{% endif %}>Comgate - Převod</option>
+        <option value="Hotove" {% if order.payment_method == 'Hotove' %}selected{% endif %}>Hotově</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="state">Stav Objednávky</label> {{order.state}}
+      <select name="state" id="state">
+        <option value="zpracovava_se" {% if order.state == 'zpracovava_se' %}selected{% endif %}>Objednávka se zpracovává</option>
+        <option value="odeslana" {% if order.state == 'odeslana' %}selected{% endif %}>Objednávka byla odeslána</option>
+        <option value="dokoncena" {% if order.state == 'dokoncena' %}selected{% endif %}>Objednávka byla dokončena</option>
+        <option value="zrusena" {% if order.state == 'zrusena' %}selected{% endif %}>Objednávka byla zrušena</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="through_option">Objednáno přes</label>
+      <select
+        name="through_option"
+        id="through_option"
+      >
+        <option value="pemic" {% if order.through_option == 'pemic' %}selected{% endif %}>Pemic</option>
+        <option value="zonerpress" {% if order.through_option == 'zonerpress' %}selected{% endif %}>E-shop = Zoner-press</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="faktura">Faktura {% if order.faktura %}- <a href="{{order.faktura.url}}" target="_blank" rel="noopener noreferrer">Současná Faktura</a>{%endif%}</label>
+      <input class="form-control"
+        type="file"
+        name="faktura"
+        id="faktura"
+        value="{{order.faktura}}"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="dodaci_list">Dodací list {% if order.dodaci_list %}- <a href="{{order.dodaci_list.url}}" target="_blank" rel="noopener noreferrer">Současný Dodací list</a>{%endif%}</label>
+      <input class="form-control"
+        type="file"
+        name="dodaci_list"
+        id="dodaci_list"
+        value="{{order.dodaci_list}}"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="sale">Sleva v %</label>
+      <input class="form-control" type="number" name="sale" id="sale" value="{{order.sale}}"  />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="note">Poznámky</label>
+      <textarea id="note" name="note" rows="5">
+        {{order.note}}
+    </textarea
+      >
+    </div>
+
+    <h2 class="m-5">Adresa</h2>
+
+    <div class="mb-3">
+      <label class="form-label" for="shipping_type">Doručovací metoda</label>
+      <select
+        name="shipping_type"
+        id="shipping_type"
+      >
+        <option value="Zasilkovna_na_adresu" {% if order.shipping.shipping_type == 'Zasilkovna_na_adresu' %}selected{% endif %}>Zásilkovna na adresu</option>
+        <option value="Zasilkovna_na_vydejni_misto"  {% if order.shipping.shipping_type == 'Zasilkovna_na_vydejni_misto' %}selected{% endif %}>
+          Zásilkovna na výdejní místo
+        </option>
+        <option value="okoli_MH"  {% if order.shipping.shipping_type == 'okoli_MH' %}selected{% endif %}>Doručení v okolí Mnichova Hradiště</option>
+      </select>
+    </div>
+
+    <h3 class="m-4">Fakturační adresa</h3>
+
+    <div class="mb-3">
+      <label class="form-label" for="f_jmeno">Jméno</label>
+      <input class="form-control"
+        type="text"
+        name="f_jmeno"
+        id="f_jmeno"
+        value="{{addresses.0.jmeno}}"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="f_mesto">Město</label>
+      <input class="form-control"
+        type="text"
+        name="f_mesto"
+        id="f_mesto"
+        value="{{addresses.0.mesto}}"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="f_ulice">Ulice</label>
+      <input class="form-control"
+        type="text"
+        name="f_ulice"
+        id="f_ulice"
+        value="{{addresses.0.ulice}}"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="f_psc">PSČ</label>
+      <input class="form-control" type="text" name="f_psc" id="f_psc" value="{{addresses.0.psc}}" />
+    </div>
+
+    <div class="mb-3">
+       
+      {% if order.shipping.FisD  %}
+      <input class="form-check-input" 
+      type="checkbox"
+      name="FisD"
+      id="FisD"
+      checked
+    />        {% else %}
+        <input class="form-check-input"
+        type="checkbox"
+        name="FisD"
+        id="FisD"
+      />
+        {% endif %}
+      <label class="form-check-label" for="FisD" >Fakturační adresa je stejná jako doručovací adresa</label
+        >
+
+     
+
+    </div>
+    
+{% if order.shipping.FisD %}
+    <div id="dorucovaci_adresa_container" style="display:none;">
+{% else %}
+<div id="dorucovaci_adresa_container" style="display:block;">
+
+{% endif %}
+      <h3 class="m-4">Doručovací adresa</h3>
+
+      <div class="mb-3">
+        <label class="form-label" for="d_jmeno">Jméno</label>
+        <input class="form-control"
+          type="text"
+          name="d_jmeno"
+          id="d_jmeno"
+          value="{{addresses.1.jmeno}}"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="d_mesto">Město</label>
+        <input class="form-control"
+          type="text"
+          name="d_mesto"
+          id="d_mesto"
+          value="{{addresses.1.mesto}}"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="d_ulice">Ulice</label>
+        <input class="form-control"
+          type="text"
+          name="d_ulice"
+          id="d_ulice"
+          value="{{addresses.1.ulice}}"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="d_psc">PSČ</label>
+        <input class="form-control" type="text" name="d_psc" id="d_psc" value="{{addresses.1.psc}}" />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-success btn-lg">Uložit</button>
+    </div>
+  </form>
+  {% if books|length > 0 %}
+  <h2 class="my-5">Knihy</h2>
+
+  <ul class="list-group list-group-flush my-5">
+  {% for book in books %}
+  <li class="list-group-item">
+    <ul class="list-inline align-middle">
+      <li class="list-inline-item mx-5 align-middle"><a href="{% url 'editBook' order.id book.id %}">{{book.name}}</a></li>
+      <li class="list-inline-item mx-5 align-middle">{{book.author}}</li>
+      <li class="list-inline-item mx-5 align-middle">{{book.price}} Kč</li>
+      <li class="list-inline-item mx-5 align-middle">{{book.qty}} x</li>
+      <li class="list-inline-item mx-5 align-middle"><span class="mx-5">
+        <form action="{% url 'deleteBook' order.id book.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-small">Odstanit Knihu {{book.name}}</button>
+        </form>
+      </span></li>
+    </ul>
+    
+    </li>
+  {% endfor %}
+  </ul>
+  {% endif %}
+  
+  <form action="{% url 'addBook' order.id  %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-lg">Přidat Knihu</button>
+    </form>
+  <form action="{% url 'deleteOrder' order.id %}" method="post" class="mt-5 text-end">
+    {% csrf_token %}
+
+    <button type="submit" class="btn btn-danger btn-sm">Odstanit Objednávku č. {{order.id}}</button>
+  </form>
+</div>
+
+<script>
+
+  document.getElementById("FisD").addEventListener("change", function () {
+    if (!this.checked) {
+      document.getElementById("dorucovaci_adresa_container").style.display =
+        "block";
+    }
+    if (this.checked) {
+      document.getElementById("dorucovaci_adresa_container").style.display =
+        "none";
+      console.log("Schovat");
+    }
+  });
+</script>
+{% endif %} {% endblock %}
