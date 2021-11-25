@@ -243,6 +243,12 @@
           <button type="submit" class="btn btn-danger btn-small">Odstanit Knihu {{book.name}}</button>
         </form>
       </span></li>
+      <li class="list-inline-item mx-5 align-middle"><span class="mx-5">
+        <form action="{% url 'editBook' order.id book.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary ">Upravit Knihu {{book.name}}</button>
+        </form>
+      </span></li>
     </ul>
     
     </li>

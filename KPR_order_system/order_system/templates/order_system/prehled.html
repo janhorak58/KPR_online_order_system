@@ -3,8 +3,20 @@
 
 
 {% endblock %} {% block content %}
-{% if user.is_authenticated %} 
-<h1 class="my-5">Přehled</h1>
+
+<div class="row justify-content-evenly" >
+  <a href="{% url 'prehled' month year 'minuly'  %}" class="col-3 text-center text-dark btn btn-light">Zobrazit Minulý měsíc</a> 
+  <a href="{% url 'prehled' %}" class="col-3 text-center text-dark btn btn-light">Zobrazit Aktuální měsíc</a> 
+  <a href="{% url 'prehled' month year 'dalsi'  %}" class="col-3 text-center text-dark btn btn-light">Zobrazit Následující měsíc</a>
+
+</div>
+{% if ordersLength > 0 %} 
+<div class="alert alert-primary mt-5" role="alert">
+  V {{month}}. Měsíci roku {{year}} je součet cen všech objednávek: <strong>{{total}}</strong> Kč.
+</div>
+<h1 class="my-5">Přehled Objednávek v {{month}}. Měsíci roku {{year}} </h1>
+
+
 <div class="accordion accordion-flush" id="accordionFlushExample">
     {% for order in orders %}
     <div class="accordion-item m-3">
@@ -23,6 +35,7 @@
                 <li class="list-group-item">Stav: {{order.state}}</li>
 
                 <li class="list-group-item">Provedeno přes: {{order.through_option}}</li>
+                <li class="list-group-item">Celková cena: {{order.total}} Kč</li>
               </ul>
         
         
@@ -32,6 +45,8 @@
   
 {% endfor %}
 </div>
-
+{% else %}
+<h1 class="my-5">V {{month}}. Měsíci roku {{year}} nemáš žádné objednávky</h1>
 {% endif %}
+
 {% endblock %}

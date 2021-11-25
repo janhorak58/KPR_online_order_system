@@ -26,9 +26,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
     
+    path('prehled/<int:m>/<int:y>/<str:zmena>/', views.prehled, name="prehled"),
+    path('prehled/<int:m>/<int:y>/', views.prehled, name="prehled"),
+    path('prehled/<int:m>/', views.prehled, name="prehled"),
+    path('prehled/', views.prehled, name="prehled"),
+    
     path('pridat/', views.addOrder, name="addOrder"),
     path('upravit/<int:pk>/', views.editOrder, name="editOrder"),
-    path('prehled/', views.prehled, name="prehled"),
+        
     path('odstranit/<int:pk>/', views.deleteOrder, name="deleteOrder"),
     path('detail/<int:pk>/', views.detailOrder, name="detailOrder"),
     path('pridatKnihu/<int:pk>/', views.addBook, name="addBook"),

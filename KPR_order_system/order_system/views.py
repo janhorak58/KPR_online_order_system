@@ -7,6 +7,19 @@ import datetime
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+def count_total(order):
+        total = 0
+        books = Book.objects.filter(order=order)
+        subtotal = 0
+        for book in books:
+            subtotal += book.price * book.qty
+        
+        try:    
+            subtotal = subtotal - (order.sale/100)
+        except:
+            pass
+        total += subtotal 
+        return total
 
 def home(request):
     if request.user.is_authenticated:
@@ -28,13 +41,52 @@ def loginuser(request):
                 return redirect("prehled")
 
 @login_required 
-def prehled(request):
+def prehled(request, m=0, y=0, zmena=""):
     if request.user.is_authenticated:
-        orders = Order.objects.all()
+        thisMonth = int(m)
+        thisYear = int(y)
+        if zmena != "":
+            if zmena == "dalsi":
+                if m < 12:
+                    thisMonth = int(m) + 1
+                    thisYear = int(y) 
+                else:
+                    thisMonth = 1
+                    thisYear = int(y) + 1
+            else:
+                if int(m) > 1:
+                    thisMonth = int(m) - 1
+                    thisYear = int(y) 
+                else:
+                    thisMonth = 12
+                    thisYear = int(y) - 1
+        
+        
+                    
+        elif int(m)==0:
+            
+            thisMonth = int(datetime.datetime.today().month)
+            thisYear = int(datetime.datetime.today().year)
+        elif int(y)==0:
+            thisYear = int(datetime.datetime.today().year)
+            thisMonth = int(m)
+        else:
+            thisYear = int(y)
+            thisMonth = int(m)
+                
+        orders = Order.objects.filter(month = thisMonth, year=thisYear)
+
         addresses = Address.objects.all()
+        ordersLength = len(orders)
+        total = 0
+        for order in orders:
+            order.total = count_total(order)
+            order.save()
+            total += order.total
+        
+                
         orders = reversed(orders)  
-        # orders.reverse()  
-        return render(request, "order_system/prehled.html", {'user':request.user, 'orders':orders, "addresses":addresses})
+        return render(request, "order_system/prehled.html", {'user':request.user, 'orders':orders, "addresses":addresses, "year":int(thisYear), "month":int(thisMonth), "ordersLength":int(ordersLength), "total":total})
     else:
         return redirect("home")
         
@@ -53,6 +105,7 @@ def addOrder(request):
         order = Order.objects.create()
         order.save()
         return redirect('editOrder', order.id)
+    
     
 @login_required
 def deleteOrder(request, pk):
@@ -82,6 +135,8 @@ def addBook(request, pk):
     book = Book.objects.create()
     book.order = order
     book.save()
+    order.total = count_total(order)
+    order.save()
     return redirect('editBook', pk, book.id)
     
     
@@ -119,6 +174,8 @@ def editBook(request, pk, sk):
                 book.qty = 1
             
             book.save()
+            order.total = count_total(order)
+            order.save()
             # return render(request, "order_system/editBook.html", {'user':request.user, 'order':order, 'book':book, "bookNum":int(sk)})
             return redirect('detailOrder', order.id)
 
@@ -214,6 +271,7 @@ def editOrder(request, pk):
             
             f_address.save()
             order.shipping = shipping
+            order.total = count_total(order)
             
             order.save()
         

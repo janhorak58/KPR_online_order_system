@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import datetime
 
     
     
@@ -16,14 +16,7 @@ class Shipping(models.Model):
     # Fakturační adresa se rovná dodací adrese
     FisD = models.BooleanField(default=True, blank=True)
     
-    
-    # def __init__(self):
-    #     self.price = self.set_price()
-    
-    # def set_price(self):
-    #     if self.shipping_type == "Zasilkovna_na_adresu": return 89.00
-    #     if self.shipping_type == "Zásilkovna_na_vydejni_misto": return 69.00
-    #     if self.shipping_type == "okoli_MH": return 30.00
+
 
 class Address(models.Model):
     address_types = (
@@ -40,7 +33,10 @@ class Address(models.Model):
 
 class Order(models.Model):
     number = models.IntegerField(blank=True, null=True, default=0)
+    total = models.FloatField(blank=True, null=True, default=0)
     created_date = models.DateTimeField(auto_now_add=True)
+    month = models.IntegerField(default = datetime.datetime.now().month)
+    year = models.IntegerField(default = datetime.datetime.now().year)
     completed_date = models.DateTimeField(null=True, blank=True)
     paid = models.BooleanField(default=False)
     payment_methods =  (
@@ -80,10 +76,10 @@ class Order(models.Model):
         return "Objednávka č. " + str(self.id)
 
 class Book(models.Model):
-    name = models.CharField(max_length=300, blank=True, null=True)
-    author = models.CharField(max_length=300, blank=True, null=True)
-    price = models.FloatField(blank=True, null=True)
-    qty = models.IntegerField(blank=True, null=True)
+    name = models.CharField(max_length=300, blank=True, null=True, default="")
+    author = models.CharField(max_length=300, blank=True, null=True, default="")
+    price = models.FloatField(blank=True, null=True, default=0)
+    qty = models.IntegerField(blank=True, null=True, default=1)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
     
     def __str__(self):
