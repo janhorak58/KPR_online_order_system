@@ -1,1 +1,1 @@
-web: gunicorn KPR_order_system.wsgi --log-file -
+web: gunicorn KPR_order_system.wsgi 
