@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
     
+    path('hledat/', views.searchOrder, name="searchOrder"),
     path('prehled/<int:m>/<int:y>/<str:zmena>/', views.prehled, name="prehled"),
     path('prehled/<int:m>/<int:y>/', views.prehled, name="prehled"),
     path('prehled/<int:m>/', views.prehled, name="prehled"),

@@ -1,52 +1,159 @@
 {% extends 'order_system/base.html' %} {% load static %} {% block head %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}" />
 
+<style>
+  
+  .orders-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  #accordionFlushExample,
+  #accordionFlushExample1 {
+    width: 50%;
+    
 
+    
+  }
+  .accordion-item {
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .date {
+      display: none;
+    }
+  }
+  
+</style>
 {% endblock %} {% block content %}
 
-<div class="row justify-content-evenly" >
-  <a href="{% url 'prehled' month year 'minuly'  %}" class="col-3 text-center text-dark btn btn-light">Zobrazit Minulý měsíc</a> 
-  <a href="{% url 'prehled' %}" class="col-3 text-center text-dark btn btn-light">Zobrazit Aktuální měsíc</a> 
-  <a href="{% url 'prehled' month year 'dalsi'  %}" class="col-3 text-center text-dark btn btn-light">Zobrazit Následující měsíc</a>
-
+<div class="row justify-content-evenly">
+  <a
+    href="{% url 'prehled' month year 'minuly'  %}"
+    class="col-3 text-center text-dark btn btn-light"
+    >Zobrazit Minulý měsíc</a
+  >
+  <a
+    href="{% url 'prehled' %}"
+    class="col-3 text-center text-dark btn btn-light"
+    >Zobrazit Aktuální měsíc</a
+  >
+  <a
+    href="{% url 'prehled' month year 'dalsi'  %}"
+    class="col-3 text-center text-dark btn btn-light"
+    >Zobrazit Následující měsíc</a
+  >
 </div>
-{% if ordersLength > 0 %} 
+{% if ordersLength > 0 %}
 <div class="alert alert-primary mt-5" role="alert">
-  V {{month}}. Měsíci roku {{year}} je součet cen všech objednávek: <strong>{{total}}</strong> Kč.
+  V {{month}}. Měsíci roku {{year}} je součet cen všech objednávek:
+  <strong>{{total}}</strong> Kč.
 </div>
-<h1 class="my-5">Přehled Objednávek v {{month}}. Měsíci roku {{year}} </h1>
+<h1 class="my-5">Přehled Objednávek v {{month}}. Měsíci roku {{year}}</h1>
 
+<form class="d-flex my-3" method="post" action="{% url 'searchOrder' %}">
+  {% csrf_token %}
 
-<div class="accordion accordion-flush" id="accordionFlushExample">
-    {% for order in orders %}
+  <!-- <label class="form-label">Zadej datum objednávky ve formátu DEN/MĚSÍC/ROK</label> -->
+  <input class="form-control me-2" type="number" name = "den" placeholder="Den - 1">
+  <input class="form-control me-2" type="number" name = "mesic" placeholder="Měsíc - {{month}}">
+  <input class="form-control me-2" type="number" name = "rok" placeholder="Rok - {{year}}">
+  <button class="btn btn-outline-primary btn-large" type="submit">Vyhledat</button>
+</form>
+<div class="orders-container">
+  <div class="accordion accordion-flush" id="accordionFlushExample">
+    {% for order in even_orders %}
     <div class="accordion-item m-3">
       <h2 class="accordion-header" id="flush-heading{{order.id}}">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{order.id}}" aria-expanded="false" aria-controls="flush-collapse{{order.id}}">
-         <span class="me-5">{{order}}</span> | <span class="ms-5">{{order.created_date}}</span>
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#flush-collapse{{order.id}}"
+          aria-expanded="false"
+          aria-controls="flush-collapse{{order.id}}"
+        >
+          <span class="me-5">{{order}}</span> |
+          <span class="ms-5 date">{{order.created_date}}</span>
         </button>
       </h2>
-      <div id="flush-collapse{{order.id}}" class="accordion-collapse collapse" aria-labelledby="flush-heading{{order.id}}" data-bs-parent="#accordionFlushExample">
+      <div
+        id="flush-collapse{{order.id}}"
+        class="accordion-collapse collapse"
+        aria-labelledby="flush-heading{{order.id}}"
+        data-bs-parent="#accordionFlushExample"
+      >
         <div class="accordion-body">
- 
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a href="{% url 'editOrder' order.id %}">Upravit</a> </li>
-                <li class="list-group-item"><a href="{% url 'detailOrder' order.id %}">Podrobnosti</a> </li>
-                <li class="list-group-item">Zaplaceno: {{order.paid}}</li>
-                <li class="list-group-item">Stav: {{order.state}}</li>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <a href="{% url 'editOrder' order.id %}">Upravit</a>
+            </li>
+            <li class="list-group-item">
+              <a href="{% url 'detailOrder' order.id %}">Podrobnosti</a>
+            </li>
+            <li class="list-group-item">Zaplaceno: {{order.paid}}</li>
+            <li class="list-group-item">Stav: {{order.state}}</li>
 
-                <li class="list-group-item">Provedeno přes: {{order.through_option}}</li>
-                <li class="list-group-item">Celková cena: {{order.total}} Kč</li>
-              </ul>
-        
-        
+            <li class="list-group-item">
+              Provedeno přes: {{order.through_option}}
+            </li>
+            <li class="list-group-item">Celková cena: {{order.total}} Kč</li>
+            <li class="list-group-item">Vytvořeno dne {{order.created_date.day}}.  {{order.created_date.month}}. {{order.created_date.year}}</li>
+            </ul>
         </div>
       </div>
     </div>
-  
-{% endfor %}
-</div>
-{% else %}
-<h1 class="my-5">V {{month}}. Měsíci roku {{year}} nemáš žádné objednávky</h1>
-{% endif %}
 
-{% endblock %}
+    {% endfor %}
+    </div>
+    <div class="accordion accordion-flush" id="accordionFlushExample1">
+      {% for order in odd_orders %}
+      <div class="accordion-item m-3">
+        <h2 class="accordion-header" id="flush-heading{{order.id}}">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#flush-collapse{{order.id}}"
+            aria-expanded="false"
+            aria-controls="flush-collapse{{order.id}}"
+          >
+            <span class="me-5">{{order}}</span> |
+            <span class="ms-5 date">{{order.created_date}}</span>
+          </button>
+        </h2>
+        <div
+          id="flush-collapse{{order.id}}"
+          class="accordion-collapse collapse"
+          aria-labelledby="flush-heading{{order.id}}"
+          data-bs-parent="#accordionFlushExample1"
+        >
+          <div class="accordion-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <a href="{% url 'editOrder' order.id %}">Upravit</a>
+              </li>
+              <li class="list-group-item">
+                <a href="{% url 'detailOrder' order.id %}">Podrobnosti</a>
+              </li>
+              <li class="list-group-item">Zaplaceno: {{order.paid}}</li>
+              <li class="list-group-item">Stav: {{order.state}}</li>
+
+              <li class="list-group-item">
+                Provedeno přes: {{order.through_option}}
+              </li>
+              <li class="list-group-item">Celková cena: {{order.total}} Kč</li>
+              <li class="list-group-item">Vytvořeno dne {{order.created_date.day}}.  {{order.created_date.month}}. {{order.created_date.year}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+
+  {% else %}
+  <h1 class="my-5">V {{month}}. Měsíci roku {{year}} nemáš žádné objednávky</h1>
+  {% endif %} {% endblock %}
+</div>

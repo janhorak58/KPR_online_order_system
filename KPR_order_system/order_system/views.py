@@ -83,14 +83,70 @@ def prehled(request, m=0, y=0, zmena=""):
             order.total = count_total(order)
             order.save()
             total += order.total
-        
+        even_orders = []
+        odd_orders = []
+        for index, order in enumerate(orders):
+            if index % 2 == 0:
+                even_orders.append(order)
+            else:
+                odd_orders.append(order)
                 
-        orders = reversed(orders)  
-        return render(request, "order_system/prehled.html", {'user':request.user, 'orders':orders, "addresses":addresses, "year":int(thisYear), "month":int(thisMonth), "ordersLength":int(ordersLength), "total":total})
+        # even_orders = reversed(even_orders)  
+        # odd_orders = reversed(odd_orders)  
+        return render(request, "order_system/prehled.html", {'user':request.user, 'even_orders':even_orders,  'odd_orders':odd_orders, "addresses":addresses, "year":int(thisYear), "month":int(thisMonth), "ordersLength":int(ordersLength), "total":total})
     else:
         return redirect("home")
         
-
+@login_required
+def searchOrder(request):
+    if request.method == "POST":
+        d = 0
+        m = 0
+        y = 0
+        try:
+            d = int(request.POST["den"])
+        except:
+            pass
+        
+        try:
+            m = int(request.POST["mesic"])
+        except:
+            pass
+        
+        try:
+            y = int(request.POST["rok"])
+        except:
+            pass
+        
+        
+        
+        if y == 0 and m == 0 and d == 0:
+            return redirect("prehled")
+        
+        elif y==0 and m == 0:
+            orders = Order.objects.filter(day=d)
+        elif y==0 and d == 0:
+            orders = Order.objects.filter(month=m)
+        elif m==0 and d == 0:
+            orders = Order.objects.filter(year=y)     
+        elif y==0:
+            orders = Order.objects.filter(day=d, month=m)
+        elif m==0:
+            orders = Order.objects.filter(year=y, day=d)
+        elif d==0:
+            orders = Order.objects.filter(year=y, month=m)
+        else:
+            orders = Order.objects.filter(year=y, month=m, day=d)
+        
+        
+        return render(request, "order_system/searchOrder.html", {"orders": orders, "month": m, "day":d, "year":y, "ordersLength":len(orders), "NoParams":False})
+    
+    else:
+        return render(request, "order_system/searchOrder.html", {"noParams": True})
+        
+            
+            
+    
 @login_required
 def logoutuser(request):
     if request.method == "POST":
@@ -121,12 +177,9 @@ def detailOrder(request, pk):
     addresses = Address.objects.filter(shipping=order.shipping)
     books = Book.objects.filter(order = order)
     total = 0
-    try:
-        for book in books:
-            total += book.price * book.qty - (book.price * book.qty * (order.sale/100))
-    except:
-        pass
-    return render(request, "order_system/detailOrder.html", {'user':request.user, 'order': order, 'addresses':addresses, "books":books, "total":total})
+    order.total = count_total(order)
+    order.save()
+    return render(request, "order_system/detailOrder.html", {'user':request.user, 'order': order, 'addresses':addresses, "books":books, "total":order.total})
 
 
 @login_required

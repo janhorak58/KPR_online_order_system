@@ -187,7 +187,22 @@
 
  
 
-<h2>Cena celkem:</h2><strong>{{total}} Kč</strong>
 </div>
 
-{% endif %}  {% endblock %}
+
+{% endif %} 
+
+<form action="{% url 'addBook' order.id  %}" method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-primary btn-lg">Přidat Knihu</button>
+  </form>
+<form action="{% url 'deleteOrder' order.id %}" method="post" class="mt-5 text-end">
+  {% csrf_token %}
+
+  <button type="submit" class="btn btn-danger btn-sm">Odstanit Objednávku č. {{order.id}}</button>
+</form>
+
+<div class="my-5">
+<h2>Cena celkem:</h2><strong>{{total}} Kč</strong>
+</div>
+{% endblock %}

@@ -35,6 +35,7 @@ class Order(models.Model):
     number = models.IntegerField(blank=True, null=True, default=0)
     total = models.FloatField(blank=True, null=True, default=0)
     created_date = models.DateTimeField(auto_now_add=True)
+    day = models.IntegerField(default = datetime.datetime.now().day)
     month = models.IntegerField(default = datetime.datetime.now().month)
     year = models.IntegerField(default = datetime.datetime.now().year)
     completed_date = models.DateTimeField(null=True, blank=True)

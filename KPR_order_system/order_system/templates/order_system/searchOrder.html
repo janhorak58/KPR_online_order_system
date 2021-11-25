@@ -1,0 +1,93 @@
+{% extends 'order_system/base.html' %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
+
+<style>
+  .accordion-item {
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .date {
+      display: none;
+    }
+  }
+  
+</style>
+{% endblock %} {% block content %}
+
+{% if NoParams or OrdersLength < 1 %}
+<h1>Byly zadány neplatné parametry</h1>
+<form class="d-flex my-3" method="post" action="{% url 'searchOrder' %}">
+    {% csrf_token %}
+  
+    <!-- <label class="form-label">Zadej datum objednávky ve formátu DEN/MĚSÍC/ROK</label> -->
+    <input class="form-control me-2" type="number" name = "den" placeholder="Den - 1">
+    <input class="form-control me-2" type="number" name = "mesic" placeholder="Měsíc - {{month}}">
+    <input class="form-control me-2" type="number" name = "rok" placeholder="Rok - {{year}}">
+    <button class="btn btn-outline-primary btn-large" type="submit">Vyhledat</button>
+  </form>
+{% else %}
+
+
+<h1 class="my-5">Vyhledávání Objednávek pro {{day}} / {{month}} / {{year}}</h1>
+
+<form class="d-flex my-3" method="post" action="{% url 'searchOrder' %}">
+  {% csrf_token %}
+
+  <!-- <label class="form-label">Zadej datum objednávky ve formátu DEN/MĚSÍC/ROK</label> -->
+  <input class="form-control me-2" type="number" name = "den" placeholder="Den - 1">
+  <input class="form-control me-2" type="number" name = "mesic" placeholder="Měsíc - {{month}}">
+  <input class="form-control me-2" type="number" name = "rok" placeholder="Rok - {{year}}">
+  <button class="btn btn-outline-primary btn-large" type="submit">Vyhledat</button>
+</form>
+<div class="orders-container">
+  <div class="accordion accordion-flush" id="accordionFlushExample">
+    {% for order in orders %}
+    <div class="accordion-item m-3">
+      <h2 class="accordion-header" id="flush-heading{{order.id}}">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#flush-collapse{{order.id}}"
+          aria-expanded="false"
+          aria-controls="flush-collapse{{order.id}}"
+        >
+          <span class="me-5">{{order}}</span> |
+          <span class="ms-5 date">{{order.created_date}}</span>
+        </button>
+      </h2>
+      <div
+        id="flush-collapse{{order.id}}"
+        class="accordion-collapse collapse"
+        aria-labelledby="flush-heading{{order.id}}"
+        data-bs-parent="#accordionFlushExample"
+      >
+        <div class="accordion-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <a href="{% url 'editOrder' order.id %}">Upravit</a>
+            </li>
+            <li class="list-group-item">
+              <a href="{% url 'detailOrder' order.id %}">Podrobnosti</a>
+            </li>
+            <li class="list-group-item">Zaplaceno: {{order.paid}}</li>
+            <li class="list-group-item">Stav: {{order.state}}</li>
+
+            <li class="list-group-item">
+              Provedeno přes: {{order.through_option}}
+            </li>
+            <li class="list-group-item">Celková cena: {{order.total}} Kč</li>
+            <li class="list-group-item">Vytvořeno dne {{order.created_date.day}}.  {{order.created_date.month}}. {{order.created_date.year}}</li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
+    </div>
+  </div>
+
+  
+ {% endif %}{% endblock %}
+</div>

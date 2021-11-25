@@ -18,11 +18,11 @@
     <form method="POST" action="{% url 'loginuser' %}">
       {% csrf_token %}
       <div class="form-group">
-        <label for="username">Username</label>
+        <label class="form-label" for="username">Uživatelské Jméno</label>
         <input type="text" name="username" class="form-control" id="username" />
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
+        <label class="form-label" for="password">Heslo</label>
         <input
           type="password"
           name="password"
@@ -30,7 +30,9 @@
           id="password"
         />
       </div>
-      <button type="submit" class="btn btn-primary my-3">Přihlásit se</button>
+      <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-primary my-3 btn-block">Přihlásit se</button>
+    </div>
     </form>
     <hr />
   </div>
